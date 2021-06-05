@@ -1,0 +1,146 @@
+app = dash.Dash(external_stylesheets=[dbc.themes.JOURNAL])
+
+# the style arguments for the sidebar. We use position:fixed and a fixed width
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "25rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+}
+
+# the styles for the main content position it to the right of the sidebar and
+# add some padding.
+CONTENT_STYLE = {
+    "margin-left": "25rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+}
+
+sidebar = html.Div(
+    [
+        html.H2("#tidytuesday", className="display-4"),
+        html.Hr(),
+        dbc.Nav(
+            [
+                dbc.NavLink("Home", href="/", active="exact"),
+                dbc.NavLink("Page 1", href="/page-1", active="exact"),
+                dbc.NavLink("Page 2", href="/page-2", active="exact"),
+            ],
+            vertical=True,
+            pills=True,
+        ),
+    ],
+    style=SIDEBAR_STYLE,
+)
+
+content = html.Div(id="page-content", style=CONTENT_STYLE)
+
+app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
+
+
+@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
+def render_page_content(pathname):
+    if pathname == "/":
+        return html.Div(children=[html.Br(),
+                                  html.H1("Netflix #tidytuesday challenge"),
+                                  html.Hr(),
+                                  html.H5(children=[html.Li(['Data Analysis using Python based on the ',
+                                                            html.Span('#tidytuesday challenge of 2021-04-21.',
+                                                                      id="tooltip-target",
+                                                                      style={'font-style': 'italic',
+                                                                             "cursor": "pointer"},
+                                                                     )
+                                                            ],
+                                                             style={'color':'black'}
+                                                           ),
+                                                     dbc.Tooltip(
+                                                                 html.A("Github #tidytuesday",
+                                                                         href='https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-04-20/readme.md',
+                                                                         style={'color':'white'}, 
+                                                                         target="_blank"),
+                                                                         autohide=False,
+                                                                         target="tooltip-target",
+                                                                         style={'backgroundColor': 'rgb(252,83,83)'},
+                                                                ),
+                                                    html.Br(),
+                                                    html.Li([html.Span('Datasets:',
+                                                                       style={"textDecoration": "underline"},
+                                                                      ),
+                                                             html.Span([' netflix_titles.csv dataset and ',
+                                                                        html.Span('IMDB datasets.',
+                                                                                  id="tooltip-imdb",
+                                                                                  style={'font-style': 'italic',
+                                                                                         "cursor": "pointer"},
+                                                                                 ),
+                                                                       ],
+                                                                      ),
+                                                             dbc.Tooltip(
+                                                                         html.A("IMDB datasets",
+                                                                                 href='https://www.imdb.com/interfaces/',
+                                                                                 style={'color':'white'}, 
+                                                                                 target="_blank"),
+                                                                                 autohide=False,
+                                                                                 target="tooltip-imdb",
+                                                                                 style={'backgroundColor': 'rgb(252,83,83)'},
+                                                                        ),
+                                                            ],
+                                                           ),    
+                                                    html.Br(),
+                                                    html.Li([html.Span('Python libraries:',
+                                                                       style={"textDecoration": "underline"},
+                                                                      ),
+                                                             html.Span(' pandas, json, plotly.express, matplotlib.pyplot, numpy, plotly.graph_objects and wordcloud.')
+                                                            ],
+                                                           ),
+                                                    html.Br(),
+                                                    html.Li(['Dash developed by ',
+                                                            html.Span('Martín Ignacio Rodríguez',
+                                                                      id="tooltip-ln",
+                                                                      style={'font-style': 'italic',
+                                                                             "cursor": "pointer"},
+                                                                     )
+                                                            ],
+                                                             style={'color':'black'}
+                                                           ),
+                                                     dbc.Tooltip(
+                                                                 html.A("Linkedin Profile",
+                                                                         href='https://www.linkedin.com/in/martin-rodriguez-47796392/',
+                                                                         style={'color':'white'}, 
+                                                                         target="_blank"),
+                                                                         autohide=False,
+                                                                         target="tooltip-ln",
+                                                                         style={'backgroundColor': 'rgb(252,83,83)'},
+                                                               ), 
+                                                   ],
+                                         ),
+                                 ],
+                       )
+    elif pathname == "/page-1":
+        return html.P("This is the content of page 1. Yay!")
+    elif pathname == "/page-2":
+        return html.P("Oh cool, this is page 2!")
+    # If the user tries to reach a different page, return a 404 message
+    return dbc.Jumbotron(
+        [
+            html.H1("404: Not found", className="text-danger"),
+            html.Hr(),
+            html.P(f"The pathname {pathname} was not recognised..."),
+        ]
+    )
+
+
+if __name__ == '__main__':
+# For Development only, otherwise use gunicorn or uwsgi to launch, e.g.
+# gunicorn -b 0.0.0.0:8050 index:app.server
+# https://community.plotly.com/t/production-and-development-enviroments/21348/2
+# https://stackoverflow.com/questions/59587439/plotly-dash-application-not-running
+# https://stackoverflow.com/questions/62378947/hot-reload-in-dash-does-not-automatically-update
+    app.run_server(#debug=True,
+        #use_reloader=False,
+        #threaded=True,
+        port=8124,#8124,8125,8126,8050
+        host='0.0.0.0'
+    )
