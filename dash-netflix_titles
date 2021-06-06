@@ -6,7 +6,7 @@ SIDEBAR_STYLE = {
     "top": 0,
     "left": 0,
     "bottom": 0,
-    "width": "25rem",
+    "width": "21rem",
     "padding": "2rem 1rem",
     "background-color": "#f8f9fa",
 }
@@ -14,7 +14,7 @@ SIDEBAR_STYLE = {
 # the styles for the main content position it to the right of the sidebar and
 # add some padding.
 CONTENT_STYLE = {
-    "margin-left": "25rem",
+    "margin-left": "21rem",
     "margin-right": "2rem",
     "padding": "2rem 1rem",
 }
@@ -23,10 +23,16 @@ sidebar = html.Div(
     [
         html.H2("#tidytuesday", className="display-4"),
         html.Hr(),
+        dbc.CardImg(src='/assets/nf-logo.jpg',
+                    style={'height':'10%',
+                           'width':'80%',
+                           "margin-left": "2rem"}
+                   ),
         dbc.Nav(
             [
-                dbc.NavLink("Home", href="/", active="exact"),
-                dbc.NavLink("Page 1", href="/page-1", active="exact"),
+                html.Br(),
+                dbc.NavLink("Scope", href="/", active="exact"),
+                dbc.NavLink("Limitaciones", href="/page-1", active="exact"),
                 dbc.NavLink("Page 2", href="/page-2", active="exact"),
             ],
             vertical=True,
@@ -44,8 +50,7 @@ app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
     if pathname == "/":
-        return html.Div(children=[html.Br(),
-                                  html.H1("Netflix #tidytuesday challenge"),
+        return html.Div(children=[html.H2("Netflix challenge: Scope", className="display-4"),
                                   html.Hr(),
                                   html.H5(children=[html.Li(['Data Analysis using Python based on the ',
                                                             html.Span('#tidytuesday challenge of 2021-04-21.',
@@ -63,7 +68,7 @@ def render_page_content(pathname):
                                                                          target="_blank"),
                                                                          autohide=False,
                                                                          target="tooltip-target",
-                                                                         style={'backgroundColor': 'rgb(252,83,83)'},
+                                                                         style={'backgroundColor': 'rgb(0,0,0)'},
                                                                 ),
                                                     html.Br(),
                                                     html.Li([html.Span('Datasets:',
@@ -80,11 +85,11 @@ def render_page_content(pathname):
                                                              dbc.Tooltip(
                                                                          html.A("IMDB datasets",
                                                                                  href='https://www.imdb.com/interfaces/',
-                                                                                 style={'color':'white'}, 
+                                                                                 style={'color':'black'}, 
                                                                                  target="_blank"),
                                                                                  autohide=False,
                                                                                  target="tooltip-imdb",
-                                                                                 style={'backgroundColor': 'rgb(252,83,83)'},
+                                                                                 style={'backgroundColor': 'rgb(239,255,0)'},
                                                                         ),
                                                             ],
                                                            ),    
@@ -112,14 +117,24 @@ def render_page_content(pathname):
                                                                          target="_blank"),
                                                                          autohide=False,
                                                                          target="tooltip-ln",
-                                                                         style={'backgroundColor': 'rgb(252,83,83)'},
-                                                               ), 
+                                                                         style={'backgroundColor': 'rgb(85,85,255)'},
+                                                               ),
                                                    ],
                                          ),
                                  ],
                        )
     elif pathname == "/page-1":
-        return html.P("This is the content of page 1. Yay!")
+        return html.Div(children=[html.H2("Netflix challenge: Limitaciones", className="display-4"),
+                                  html.Hr(),
+                                  html.H5(children=[html.Li('El dataset original netflix_titles.csv contaba con 7787 registros. Fueron eliminados 2979 registros con valores nulos en las columnas director, cast, country, date_added y rating.'),
+                                                    html.Br(),
+                                                    html.Li('Para el análisis de duración de las movies/tv shows no se consideraron 135 casos cuya duración estaba expresada en temporadas en lugar de minutos.'),
+                                                    html.Br(),
+                                                    html.Li('De los 4808 registros usados para el analisis del dataset netflix_titles.csv sólo se pudieron mergear 1486 con los dataset de IMDB.')
+                                                    ],
+                                          ),
+                                  ],
+                       ),
     elif pathname == "/page-2":
         return html.P("Oh cool, this is page 2!")
     # If the user tries to reach a different page, return a 404 message
