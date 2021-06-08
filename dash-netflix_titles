@@ -1,6 +1,5 @@
 app = dash.Dash(external_stylesheets=[dbc.themes.JOURNAL])
 
-# the style arguments for the sidebar. We use position:fixed and a fixed width
 SIDEBAR_STYLE = {
     "position": "fixed",
     "top": 0,
@@ -11,8 +10,6 @@ SIDEBAR_STYLE = {
     "background-color": "#f8f9fa",
 }
 
-# the styles for the main content position it to the right of the sidebar and
-# add some padding.
 CONTENT_STYLE = {
     "margin-left": "21rem",
     "margin-right": "2rem",
@@ -49,13 +46,48 @@ sidebar=html.Div(
                                           direction="right"
                                          ),
                          html.Br(),
-                         dbc.DropdownMenu(label="Per country",
-                                          children=[dbc.DropdownMenuItem("World",
+                         dbc.DropdownMenu(label="World",
+                                          children=[dbc.DropdownMenuItem("Movies/TV Shows",
                                                                          style={'backgroundColor': 'rgb(255,255,255)',
                                                                                 'color':'black',
                                                                                 'font-family': 'Arial Narrow',
                                                                                 'font-weight':700},
                                                                          href="/page-2",
+                                                                         active="exact"),
+                                                    dbc.DropdownMenuItem("Titles per year",
+                                                                         style={'backgroundColor': 'rgb(255,255,255)',
+                                                                                'color':'black',
+                                                                                'font-family': 'Arial Narrow',
+                                                                                'font-weight':700},
+                                                                         href="/page-3",
+                                                                         active="exact"),
+                                                    dbc.DropdownMenuItem("Directors and Cast",
+                                                                         style={'backgroundColor': 'rgb(255,255,255)',
+                                                                                'color':'black',
+                                                                                'font-family': 'Arial Narrow',
+                                                                                'font-weight':700},
+                                                                         href="/page-4",
+                                                                         active="exact"),
+                                                    dbc.DropdownMenuItem("Average duration",
+                                                                         style={'backgroundColor': 'rgb(255,255,255)',
+                                                                                'color':'black',
+                                                                                'font-family': 'Arial Narrow',
+                                                                                'font-weight':700},
+                                                                         href="/page-5",
+                                                                         active="exact"),
+                                                    dbc.DropdownMenuItem("Ratings class",
+                                                                         style={'backgroundColor': 'rgb(255,255,255)',
+                                                                                'color':'black',
+                                                                                'font-family': 'Arial Narrow',
+                                                                                'font-weight':700},
+                                                                         href="/page-6",
+                                                                         active="exact"),
+                                                    dbc.DropdownMenuItem("Categories",
+                                                                         style={'backgroundColor': 'rgb(255,255,255)',
+                                                                                'color':'black',
+                                                                                'font-family': 'Arial Narrow',
+                                                                                'font-weight':700},
+                                                                         href="/page-7",
                                                                          active="exact")
                                                    ],
                                           color="#eb6864",
@@ -73,7 +105,6 @@ sidebar=html.Div(
 content = html.Div(id="page-content", style=CONTENT_STYLE)
 
 app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
-
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
@@ -166,22 +197,58 @@ def render_page_content(pathname):
     elif pathname == "/page-2":
         return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
                                   html.Hr(),
+                                  html.Div('El siguiente treemap muestra la cantidad y concentración de movies y tv shows producidas por país. Las movies representan el 97% del total mientras que los tv shows sólo el 3%. Existe una concentración del 66% de movies producidas en 5 países: US, India, UK, Canada y Francia.'),
+                                  html.Br(),
                                   html.Div(id='country',
                                            children='Choose a type: '),
                                   dcc.Dropdown(id='dropdown',
-                                               options=[{'label':'Movie',
-                                                         'value':'Movie'},
-                                                        {'label':'TV Show',
-                                                         'value':'TV Show'}
+                                               options=[{'label':'Movies',
+                                                         'value':'Movies'},
+                                                        {'label':'TV Shows',
+                                                         'value':'TV Shows'},
+                                                        {'label':'Movies+TV Shows',
+                                                         'value':'Movies/TV Shows'}
                                                        ],
                                                value='Movie',
                                                multi=False
                                              ),
-                                  html.Br(),
                                   dcc.Graph(id='Grafico_1',
                                             figure=country_treemap)
                                 ],
-                       )    
+                       ),
+    elif pathname == "/page-3":
+        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+                                  html.Hr(),
+                                  html.Div('El siguiente bar plot muestra la cantidad de títulos agregados por año desde el 2008 al 2021 abiertos por movies y tv shows. El año 2021 sólo cuenta con información de 5 meses.'),
+                                  html.Br(),
+                                  dcc.Graph(id='Grafico_2',
+                                            figure=mtv_yearadded)
+                                ],
+                       ),
+    elif pathname == "/page-4":
+        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+                                  html.Hr(),
+                                  html.Div('El siguiente bar plot muestra la cantidad de títulos agregados por año desde el 2008 al 2021 abiertos por movies y tv shows. El año 2021 sólo cuenta con información de 5 meses.'),
+                                ],
+                       ),
+    elif pathname == "/page-5":
+        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+                                  html.Hr(),
+                                  html.Div('El siguiente bar plot muestra la cantidad de títulos agregados por año desde el 2008 al 2021 abiertos por movies y tv shows. El año 2021 sólo cuenta con información de 5 meses.'),
+                                ],
+                       ),
+    elif pathname == "/page-6":
+        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+                                  html.Hr(),
+                                  html.Div('El siguiente bar plot muestra la cantidad de títulos agregados por año desde el 2008 al 2021 abiertos por movies y tv shows. El año 2021 sólo cuenta con información de 5 meses.'),
+                                ],
+                       ),
+    elif pathname == "/page-7":
+        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+                                  html.Hr(),
+                                  html.Div('El siguiente bar plot muestra la cantidad de títulos agregados por año desde el 2008 al 2021 abiertos por movies y tv shows. El año 2021 sólo cuenta con información de 5 meses.'),
+                                ],
+                       ),
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [
@@ -203,21 +270,18 @@ def update_output_dropdown(select_value):
     Output(component_id='Grafico_1',component_property='figure'),
     Input(component_id='dropdown',component_property='value')
 )
-def update_grafico(select_value):
-  country_treemap=px.treemap(data_frame=df_shows_country[['movies_tvshows','country','Movie','TV Show']],
+def update_treemap(select_value):
+  country_treemap=px.treemap(data_frame=df_shows_country[['Movies/TV Shows','country','Movies','TV Shows']],
                              path=[px.Constant('Total '+ select_value + ' produced per country'),'country'],
                              values=select_value)
   country_treemap.data[0].textinfo = 'label+value+percent parent'
   country_treemap.layout.hovermode = False
+  country_treemap.update_layout(margin=dict(l=10,
+                                          r=10,
+                                          t=10,
+                                          b=10)
+                             )                      
   return country_treemap
 
-# For Development only, otherwise use gunicorn or uwsgi to launch, e.g.
-# gunicorn -b 0.0.0.0:8050 index:app.server
-# https://community.plotly.com/t/production-and-development-enviroments/21348/2
-# https://stackoverflow.com/questions/59587439/plotly-dash-application-not-running
-# https://stackoverflow.com/questions/62378947/hot-reload-in-dash-does-not-automatically-update
-# debug=True,
-# use_reloader=False,
-# threaded=True, 
 if __name__ == '__main__':  
     app.run_server(port=8124, host='0.0.0.0')#8124,8125,8126,8050
