@@ -111,10 +111,10 @@ def render_page_content(pathname):
     if pathname == "/":
         return html.Div(children=[html.H2("Netflix challenge: Scope", className="display-4"),
                                   html.Hr(),
-                                  html.H5(children=[html.Li(['Data Analysis using Python based on the ',
+                                  html.Div(children=[html.Li(['Data Analysis using Python based on the ',
                                                             html.Span('#tidytuesday challenge of 2021-04-21.',
                                                                       id="tooltip-target",
-                                                                      style={'font-style': 'italic',
+                                                                      style={"textDecoration": "underline",
                                                                              "cursor": "pointer"},
                                                                      )
                                                             ],
@@ -136,7 +136,7 @@ def render_page_content(pathname):
                                                              html.Span([' netflix_titles.csv dataset and ',
                                                                         html.Span('IMDB datasets.',
                                                                                   id="tooltip-imdb",
-                                                                                  style={'font-style': 'italic',
+                                                                                  style={"textDecoration": "underline",
                                                                                          "cursor": "pointer"},
                                                                                  ),
                                                                        ],
@@ -163,7 +163,7 @@ def render_page_content(pathname):
                                                     html.Li(['Dash developed by ',
                                                             html.Span('Martín Ignacio Rodríguez',
                                                                       id="tooltip-ln",
-                                                                      style={'font-style': 'italic',
+                                                                      style={"textDecoration": "underline",
                                                                              "cursor": "pointer"},
                                                                      )
                                                             ],
@@ -185,11 +185,13 @@ def render_page_content(pathname):
     elif pathname == "/page-1":
         return html.Div(children=[html.H2("Netflix challenge: Limitaciones", className="display-4"),
                                   html.Hr(),
-                                  html.H5(children=[html.Li('El dataset original netflix_titles.csv contaba con 7787 registros. Fueron eliminados 2979 registros con valores nulos en las columnas director, cast, country, date_added y rating.'),
+                                  html.Div(children=[html.Li('El dataset original netflix_titles.csv contaba con 7787 registros. Fueron eliminados 2979 registros con valores nulos en las columnas director, cast, country, date_added y rating.'),
                                                     html.Br(),
                                                     html.Li('Para el análisis de duración de las movies/tv shows no se consideraron 135 casos cuya duración estaba expresada en temporadas en lugar de minutos.'),
                                                     html.Br(),
-                                                    html.Li('De los 4808 registros usados para el analisis del dataset netflix_titles.csv sólo se pudieron mergear 1486 con los dataset de IMDB.')
+                                                    html.Li('De los 4808 registros usados para el analisis del dataset netflix_titles.csv sólo se pudieron mergear 1486 con los dataset de IMDB.'),
+                                                    html.Br(),
+                                                    html.Li('El año 2021 sólo cuenta con información de 5 meses.')
                                                     ],
                                           ),
                                   ],
@@ -228,14 +230,18 @@ def render_page_content(pathname):
     elif pathname == "/page-4":
         return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
                                   html.Hr(),
-                                  html.Div('El siguiente bar plot muestra la cantidad de títulos agregados por año desde el 2008 al 2021 abiertos por movies y tv shows. El año 2021 sólo cuenta con información de 5 meses.'),
-                                ],
+                                  html.Div('El top ten de cast concentra el 0.7% del total de títulos del dataset. El promedio de títulos por cast es de 1.63. Por ende no se observa concentración de títulos en pocos actores.'),
+                                  html.Br(),
+                                  html.Div('El top ten de directores concentra el 2.5% del total de títulos del dataset. El promedio de títulos por director es de 1.36. Por ende no se observa concentración de títulos en pocos directores.')
+                                 ],
                        ),
     elif pathname == "/page-5":
         return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
                                   html.Hr(),
-                                  html.Div('El siguiente bar plot muestra la cantidad de títulos agregados por año desde el 2008 al 2021 abiertos por movies y tv shows. El año 2021 sólo cuenta con información de 5 meses.'),
-                                ],
+                                  html.Div('El siguiente line graph muestra el average de duración en minutos de los títulos desde 2008 al 2021 para el top 5 de países que representan el 65% del total de los títulos del dataset. Se excluyeron del análisis aquellos títulos cuya duración estuviera expresada en minutos.'),
+                                  dcc.Graph(id='Grafico_3',
+                                            figure=avg_min_line_country2)
+                                 ],
                        ),
     elif pathname == "/page-6":
         return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
@@ -246,8 +252,11 @@ def render_page_content(pathname):
     elif pathname == "/page-7":
         return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
                                   html.Hr(),
-                                  html.Div('El siguiente bar plot muestra la cantidad de títulos agregados por año desde el 2008 al 2021 abiertos por movies y tv shows. El año 2021 sólo cuenta con información de 5 meses.'),
-                                ],
+                                  html.Div('El siguiente wordcloud muestra las distintas categorías en las que se clasifican los títulos del dataset. La categoría "International Movies" es la que más se repite considerando que el 64% de los títulos pertenecen a países distintos a US.'),
+                                  html.Br(),
+                                  dbc.CardImg(src=wc_cat
+                                             ),
+                                 ],
                        ),
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
@@ -284,4 +293,4 @@ def update_treemap(select_value):
   return country_treemap
 
 if __name__ == '__main__':  
-    app.run_server(port=8124, host='0.0.0.0')#8124,8125,8126,8050
+    app.run_server(port=8126, host='0.0.0.0')#8124,8125,8126,8050
