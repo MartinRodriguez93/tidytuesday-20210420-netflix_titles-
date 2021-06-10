@@ -88,6 +88,13 @@ sidebar=html.Div(
                                                                                 'font-family': 'Arial Narrow',
                                                                                 'font-weight':700},
                                                                          href="/page-7",
+                                                                         active="exact"),
+                                                    dbc.DropdownMenuItem("Titles per country",
+                                                                         style={'backgroundColor': 'rgb(255,255,255)',
+                                                                                'color':'black',
+                                                                                'font-family': 'Arial Narrow',
+                                                                                'font-weight':700},
+                                                                         href="/page-8",
                                                                          active="exact")
                                                    ],
                                           color="#eb6864",
@@ -197,7 +204,7 @@ def render_page_content(pathname):
                                   ],
                        ),
     elif pathname == "/page-2":
-        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+        return html.Div(children=[html.H2("Netflix challenge: Movies/TV Shows", className="display-4"),
                                   html.Hr(),
                                   html.Div('El siguiente treemap muestra la cantidad y concentración de movies y tv shows producidas por país. Las movies representan el 97% del total mientras que los tv shows sólo el 3%. Existe una concentración del 66% de movies producidas en 5 países: US, India, UK, Canada y Francia.'),
                                   html.Br(),
@@ -219,7 +226,7 @@ def render_page_content(pathname):
                                 ],
                        ),
     elif pathname == "/page-3":
-        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+        return html.Div(children=[html.H2("Netflix challenge: Titles per year", className="display-4"),
                                   html.Hr(),
                                   html.Div('El siguiente bar plot muestra la cantidad de títulos agregados por año desde el 2008 al 2021 abiertos por movies y tv shows. El año 2021 sólo cuenta con información de 5 meses.'),
                                   html.Br(),
@@ -228,15 +235,15 @@ def render_page_content(pathname):
                                 ],
                        ),
     elif pathname == "/page-4":
-        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+        return html.Div(children=[html.H2("Netflix challenge: Directors and Cast", className="display-4"),
                                   html.Hr(),
                                   html.Div('El top ten de cast concentra el 0.7% del total de títulos del dataset. El promedio de títulos por cast es de 1.63. Por ende no se observa concentración de títulos en pocos actores.'),
                                   html.Br(),
-                                  html.Div('El top ten de directores concentra el 2.5% del total de títulos del dataset. El promedio de títulos por director es de 1.36. Por ende no se observa concentración de títulos en pocos directores.')
+                                  html.Div('El top ten de directores concentra el 2.5% del total de títulos del dataset. El promedio de títulos por director es de 1.36. Por ende no se observa concentración de títulos en pocos directores.'),
                                  ],
-                       ),
+                        ),
     elif pathname == "/page-5":
-        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+        return html.Div(children=[html.H2("Netflix challenge: Average Duration", className="display-4"),
                                   html.Hr(),
                                   html.Div('El siguiente line graph muestra el average de duración en minutos de los títulos desde 2008 al 2021 para el top 5 de países que representan el 65% del total de los títulos del dataset. Se excluyeron del análisis aquellos títulos cuya duración estuviera expresada en minutos.'),
                                   dcc.Graph(id='Grafico_3',
@@ -244,13 +251,32 @@ def render_page_content(pathname):
                                  ],
                        ),
     elif pathname == "/page-6":
-        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+        return html.Div(children=[html.H2("Netflix challenge: Ratings class", className="display-4"),
                                   html.Hr(),
-                                  html.Div('El siguiente bar plot muestra la cantidad de títulos agregados por año desde el 2008 al 2021 abiertos por movies y tv shows. El año 2021 sólo cuenta con información de 5 meses.'),
-                                ],
+                                  html.Div(['El siguiente pie chart muestra la concentración de cada tipo de rating sobre el total de títulos desde 2008 al 2021. La siguiente página muestra el significado de cada uno de los ',
+                                            html.Span('tipos de ratings.',
+                                                      id="tooltip-ratings",
+                                                      style={"textDecoration": "underline",
+                                                             "cursor": "pointer"},
+                                                     ),
+                                            html.Span(' En base al significado de los tipos de ratings se puede observar que aproximadamente el 90% de las movies y tv shows de Netflix apuntan a un público adulto.'),
+                                           ],
+                                          ),
+                                  dbc.Tooltip(
+                                              html.A("Ratings meanings",
+                                                     href='https://www.spectrum.net/support/tv/tv-and-movie-ratings-descriptions/',
+                                                     style={'color':'white'}, 
+                                                     target="_blank"),
+                                                     autohide=False,
+                                                     target="tooltip-ratings",
+                                                     style={'backgroundColor': 'rgb(0,0,0)'},
+                                                    ),
+                                  dcc.Graph(id='Grafico_4',
+                                            figure=pie_shows_rating)
+                                 ],
                        ),
     elif pathname == "/page-7":
-        return html.Div(children=[html.H2("Netflix challenge: per country", className="display-4"),
+        return html.Div(children=[html.H2("Netflix challenge: Categories", className="display-4"),
                                   html.Hr(),
                                   html.Div('El siguiente wordcloud muestra las distintas categorías en las que se clasifican los títulos del dataset. La categoría "International Movies" es la que más se repite considerando que el 64% de los títulos pertenecen a países distintos a US.'),
                                   html.Br(),
@@ -258,6 +284,13 @@ def render_page_content(pathname):
                                              ),
                                  ],
                        ),
+    elif pathname == "/page-8":
+        return html.Div(dash_table.DataTable(id='tabla',
+                                             records=[{}],
+                                             data=df_shows_year_country.to_dict(orient="records"),
+                                             columns=data_table_col
+                                                      ),
+                        ),
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [
@@ -269,8 +302,7 @@ def render_page_content(pathname):
 
 #Callback filter per movie/tv show:
 @app.callback(Output(component_id='country', component_property='children'),
-                      Input(component_id='dropdown', component_property='value')
-                     )
+                      Input(component_id='dropdown', component_property='value'))
 def update_output_dropdown(select_value):
     return 'Choose a type: '
     
@@ -293,4 +325,4 @@ def update_treemap(select_value):
   return country_treemap
 
 if __name__ == '__main__':  
-    app.run_server(port=8126, host='0.0.0.0')#8124,8125,8126,8050
+    app.run_server(port=8124, host='0.0.0.0')#8124,8125,8126,8050
