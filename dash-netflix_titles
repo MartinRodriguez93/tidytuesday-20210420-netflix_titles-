@@ -1,3 +1,62 @@
+import pandas as pd
+import dash
+from jupyter_dash import JupyterDash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input,Output,State
+import plotly.express as px
+import json
+import dash_bootstrap_components as dbc
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+import dash_table
+from dash_table.Format import Format, Group, Scheme, Symbol
+
+------------------------------------------------------------------------------------------------------------------------------
+
+#DF masters:
+
+#DF Treemap:
+df_shows_country=pd.read_csv('/Users/martinrodriguez/Archivos Martin/Data Analytics/GitHub/netflix_titles/Datasets/df_shows_country.csv')
+df_shows_country=df_shows_country.rename(columns={'Movie': 'Movies','TV Show': 'TV Shows','movies_tvshows': 'Movies/TV Shows'})
+
+#DF Barplot:
+df_shows_yearadded=pd.read_csv('/Users/martinrodriguez/Archivos Martin/Data Analytics/GitHub/netflix_titles/Datasets/df_shows_yearadded.csv')
+
+#DF line:
+nf_df_ex_country=pd.read_csv('/Users/martinrodriguez/Archivos Martin/Data Analytics/GitHub/netflix_titles/Datasets/nf_df_ex_country.csv')
+
+#DF wordcloud:
+nf_df_ex_listed_in=pd.read_csv('/Users/martinrodriguez/Archivos Martin/Data Analytics/GitHub/netflix_titles/Datasets/nf_df_ex_listed_in.csv')
+
+#DF ratings:
+nf_titles_df_final=pd.read_csv('/Users/martinrodriguez/Archivos Martin/Data Analytics/GitHub/netflix_titles/Datasets/nf_titles_df_final.csv')
+
+#DF datatable countries:
+df_shows_year_country=pd.read_csv('/Users/martinrodriguez/Archivos Martin/Data Analytics/GitHub/netflix_titles/Datasets/df_shows_year_country.csv')
+df_shows_year_country.rename(columns={'type':'Q Movies/TV Shows','country':'Country','year_added':'Year Added'}, inplace = True)
+
+#DF datatable ratings: https://emojipedia.org/star/
+nf_imdb_merge_final_found=pd.read_csv('/Users/martinrodriguez/Archivos Martin/Data Analytics/GitHub/netflix_titles/Datasets/nf_imdb_merge_final_found.csv')
+nf_imdb_merge_final_found.rename(columns={'title':'Title','release_year':'Release Year','averageRating':'Avg Rating','numVotes':'Votes'}, inplace = True)
+nf_imdb_merge_final_found['Stars'] = nf_imdb_merge_final_found['Avg Rating'].apply(lambda x:
+                                                                                      '⭐⭐⭐' if x > 8 else(
+                                                                                      '⭐⭐' if x > 5 else ('⭐')
+                                                                                      )
+                                                                                     )
+                                                                                     
+------------------------------------------------------------------------------------------------------------------------------
+
+#List of dictionaries for countries data table options:
+list_options_country=[]
+for i in df_shows_year_country['Country'].sort_values().unique():
+    country={'label': i,
+             'value': i
+            }
+    list_options_country.append(country)
+    
+------------------------------------------------------------------------------------------------------------------------------
+
 app = dash.Dash(external_stylesheets=[dbc.themes.JOURNAL])
 
 SIDEBAR_STYLE = {
@@ -298,7 +357,14 @@ def render_page_content(pathname):
     elif pathname == "/page-8":
         return html.Div(children=[html.H2("Netflix challenge: Titles per country", className="display-4"),
                                   html.Hr(),
-                                  html.Div('La siguiente data table muestra la cantidad de títulos agregados por año por país. Es posible filtrar y ordenar por cualquiera de las columnas.'),
+                                  html.Div('La siguiente data table muestra la cantidad de títulos agregados por año por país (ver listado de paises disponibles en el dropdown menu). Es posible filtrar y ordenar por cualquiera de las columnas.'),
+                                  html.Br(),
+                                  dcc.Dropdown(id='dropdown2',
+                                               options=list_options_country,
+                                               value=[],
+                                               multi=False,
+                                               placeholder="Available countries",
+                                             ),
                                   html.Br(),
                                   dash_table.DataTable(id='tabla',
                                                        data=df_shows_year_country.to_dict("records"),
@@ -307,7 +373,7 @@ def render_page_content(pathname):
                                                        sort_action='native',
                                                        sort_mode='multi',
                                                        page_current=0,
-                                                       page_size=12,
+                                                       page_size=10,
                                                        style_header={'backgroundColor': '#eb6864',
                                                                      'color': 'white'
                                                                     },
@@ -327,12 +393,24 @@ def render_page_content(pathname):
                                   html.Br(),
                                   dash_table.DataTable(id='tabla2',
                                                        data=nf_imdb_merge_final_found.to_dict("records"),
-                                                       columns=[{'name':i,'id':i,
-                                                                 'selectable':True} for i in ['Title',
-                                                                                              'Release Year',
-                                                                                              'Avg Rating',
-                                                                                              'Votes',
-                                                                                              'Stars']
+                                                       columns=[{'name':i,
+                                                                 'id':i,
+                                                                 'selectable':True,
+                                                                 'type': 'numeric',
+                                                                 'format': Format(scheme=Scheme.fixed, 
+                                                                                  precision=0,
+                                                                                  group=Group.yes,
+                                                                                  groups=3,
+                                                                                  group_delimiter='.',
+                                                                                  decimal_delimiter=',')
+                                                                }
+                                                                if i == 'Votes'
+                                                                else {'name':i,'id':i,'selectable':True}
+                                                                for i in ['Title',
+                                                                          'Release Year',
+                                                                          'Avg Rating',
+                                                                          'Votes',
+                                                                          'Stars']
                                                                ],
                                                        filter_action='native',
                                                        sort_action='native',
@@ -359,12 +437,6 @@ def render_page_content(pathname):
         ]
     )
 
-#Callback filter per movie/tv show:
-@app.callback(Output(component_id='country', component_property='children'),
-                      Input(component_id='dropdown', component_property='value'))
-def update_output_dropdown(select_value):
-    return 'Choose a type: '
-    
 #Callback graph
 @app.callback(
     Output(component_id='Grafico_1',component_property='figure'),
@@ -384,4 +456,5 @@ def update_treemap(select_value):
   return country_treemap
 
 if __name__ == '__main__':  
-    app.run_server(port=8126, host='0.0.0.0')#8124,8125,8126,8050
+    app.run_server(port=8124, host='0.0.0.0')#8124,8125,8126,8050
+
